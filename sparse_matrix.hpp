@@ -290,7 +290,14 @@ public:
     if (memory_space == MemorySpace::CUDA)
       {
 #ifndef DISABLE_CUDA
-        // TODO implement for GPU (with CRS and ELLPACK/SELL-C-sigma)
+        const unsigned int n_blocks = (n_rows + block_size - 1) / block_size;
+        compute_spmv<<<n_blocks, block_size>>>(n_rows,
+                                               row_starts,
+                                               column_indices,
+                                               values,
+                                               src.begin(),
+                                               dst.begin());
+        
         AssertCuda(cudaPeekAtLastError());
 #endif
       }
