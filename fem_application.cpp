@@ -219,7 +219,7 @@ int main(int argc, char **argv)
     }
 
   if (N == -1)
-    for (unsigned long long NN = 24; NN < 500; NN += 24)
+    for (unsigned long long NN = 24; NN < 257; NN += 24)
       {
         if (number == "double")
           run_test<double>(NN, n_repeat);
