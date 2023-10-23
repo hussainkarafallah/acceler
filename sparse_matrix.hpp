@@ -106,7 +106,7 @@ public:
 
   void convertToCellCSigma() {
 
-    SELL_num_blocks = (crsMatrix.get_n_rows() + C - 1) / C;
+    SELL_num_blocks = (n_rows + C - 1) / C;
 
     // Allocate memory for values, column_indices, and block_lengths
     SELL_values = new Number[SELL_num_blocks * C * C];
@@ -123,12 +123,12 @@ public:
     }
 
     // Convert CRS format to CELL-C-Sigma format
-    for (int i = 0; i < crsMatrix.get_n_rows(); i++) {
+    for (int i = 0; i < n_rows; i++) {
         int block_idx = i / C;
         int block_offset = i % C;
-        for (int j = crsMatrix.get_row_starts()[i]; j < crsMatrix.get_row_starts()[i + 1]; j++) {
-            int col = crsMatrix.get_column_indices()[j];
-            Number value = crsMatrix.values[j];
+        for (int j = row_starts[i]; j < row_starts[i + 1]; j++) {
+            int col = column_indices[j];
+            Number value = values[j];
 
             int position = block_idx * C * C + block_offset * C + col % C;
             SELL_values[position] = value;
