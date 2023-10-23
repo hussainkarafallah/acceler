@@ -94,6 +94,7 @@ void run_test(const long long N, const long long n_repeat)
   const MemorySpace host_space = MemorySpace::Host;
 
   SparseMatrix<Number> matrix = fill_sparse_matrix<Number>(N, host_space);
+  matrix.convertToCellCSigma();
   SparseMatrix<Number> matrix_dev = matrix.copy_to_device();
 
   Vector<Number>    src(N * N * N, host_space);

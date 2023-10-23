@@ -104,6 +104,39 @@ public:
     n_global_nonzero_entries = mpi_sum(n_entries, communicator);
   }
 
+  void convertToCellCSigma() {
+
+    SELL_num_blocks = (crsMatrix.get_n_rows() + C - 1) / C;
+
+    // Allocate memory for values, column_indices, and block_lengths
+    SELL_values = new Number[SELL_num_blocks * C * C];
+    SELL_column_indices = new int[SELL_num_blocks * C * C];
+    SELL_block_lengths = new int[SELL_num_blocks];
+
+    // Initialize values and column_indices with zeros and block_lengths with C
+    for (int i = 0; i < SELL_num_blocks * C * C; i++) {
+        SELL_values[i] = 0.0;
+        SELL_column_indices[i] = 0;
+    }
+    for (int i = 0; i < SELL_num_blocks; i++) {
+        SELL_block_lengths[i] = C;
+    }
+
+    // Convert CRS format to CELL-C-Sigma format
+    for (int i = 0; i < crsMatrix.get_n_rows(); i++) {
+        int block_idx = i / C;
+        int block_offset = i % C;
+        for (int j = crsMatrix.get_row_starts()[i]; j < crsMatrix.get_row_starts()[i + 1]; j++) {
+            int col = crsMatrix.get_column_indices()[j];
+            Number value = crsMatrix.values[j];
+
+            int position = block_idx * C * C + block_offset * C + col % C;
+            SELL_values[position] = value;
+            SELL_column_indices[position] = col;
+        }
+    }
+  }
+
   ~SparseMatrix()
   {
     if (memory_space == MemorySpace::CUDA)
@@ -290,6 +323,7 @@ public:
     if (memory_space == MemorySpace::CUDA)
       {
 #ifndef DISABLE_CUDA
+  #ifndef CELL
         const unsigned int n_blocks = (n_rows + block_size - 1) / block_size;
         compute_spmv<<<n_blocks, block_size>>>(n_rows,
                                                row_starts,
@@ -299,6 +333,9 @@ public:
                                                dst.begin());
         
         AssertCuda(cudaPeekAtLastError());
+  #else
+      // do cell shit
+  #endif
 #endif
       }
     else
@@ -374,6 +411,11 @@ private:
   Number *      values;
   std::size_t   n_global_nonzero_entries;
   MemorySpace   memory_space;
+
+  Number *SELL_values;          
+  unsigned int *SELL_column_indices;     
+  unsigned int *SELL_block_lengths;
+  unsigned int SELL_num_blocks;
 
   struct GhostEntryCoordinateFormat
   {
