@@ -46,6 +46,10 @@ class SparseMatrix
 public:
   static const int block_size = Vector<Number>::block_size;
 
+  int get_size(){
+    return row_starts[n_rows-1];
+  }
+
   SparseMatrix(const std::vector<unsigned int> &row_lengths,
                const MemorySpace                memory_space,
                const MPI_Comm                   communicator)

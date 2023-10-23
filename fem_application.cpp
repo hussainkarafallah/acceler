@@ -90,12 +90,13 @@ void run_test(const long long N, const long long n_repeat)
 
   std::cout << "Computing on a " << N << "^3 domain with "
             << (std::is_same<Number, double>::value ? "double" : "float")
-            << " numbers" << std::endl;
+            << " numbers with also" << std::endl;
 
   MPI_Comm communicator = MPI_COMM_SELF;
   const MemorySpace memory_space = MemorySpace::Host;
 
   SparseMatrix<Number> matrix = fill_sparse_matrix<Number>(N, memory_space);
+  std::cout<<"Zobby "<<matrix.get_size()<<"\n";
 
   Vector<Number>    src(N * N * N, memory_space);
   Vector<Number>    dst(src), result(src);
