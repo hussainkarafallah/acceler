@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "vector.hpp"
+#define C 32
 
 
 #ifndef DISABLE_CUDA
@@ -110,8 +111,8 @@ public:
 
     // Allocate memory for values, column_indices, and block_lengths
     SELL_values = new Number[SELL_num_blocks * C * C];
-    SELL_column_indices = new int[SELL_num_blocks * C * C];
-    SELL_block_lengths = new int[SELL_num_blocks];
+    SELL_column_indices = new unsigned int[SELL_num_blocks * C * C];
+    SELL_block_lengths = new unsigned int[SELL_num_blocks];
 
     // Initialize values and column_indices with zeros and block_lengths with C
     for (int i = 0; i < SELL_num_blocks * C * C; i++) {
